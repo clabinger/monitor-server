@@ -1,0 +1,10 @@
+{
+  "name": "monitor-server",
+  "version": "1.0.0",
+  "description": "Ping my development server and email me if it is running (in case I forgot to shut it down when not in use)",
+  "main": "index.js",
+  "repository": "https://github.com/clabinger/monitor-server",
+  "author": "Cooper Labinger",
+  "license": "MIT",
+  "private": true
+}
