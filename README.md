@@ -6,3 +6,10 @@ charged for it during that time.
 
 I originally tried to use ping, but Google Cloud Platform responds to ping requests even if a server is powered down. Instead, this script uses cURL and examines the error string to determine if a server is powered on.
 
+## Usage
+
+### Run from command line
+
+``` bash
+$ node index.js init
+```
