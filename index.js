@@ -2,6 +2,8 @@ const config = require('./config.json');
 
 const curl = require('curlrequest');
 const SparkPost = require('sparkpost');
+const {ErrorReporting} = require('@google-cloud/error-reporting');
+const errors = new ErrorReporting();
 
 // Search curl error message for the following substrings. Status: 0 = server off, 1 = server on
 const messages = [
@@ -33,12 +35,9 @@ const send_email = function(message){
     return_path: config.email_return_path,
     recipients: config.emails.map(email => ({address: email})),
   })
-  .then(data => {
-    // Email was successful
-  })
   .catch(err => {
     // Email failed
-    console.error(err);
+    errors.report(new Error(err));
   });
 }
 
@@ -64,7 +63,7 @@ const handle_status = function(hostname, status, curl_message){
 
 }
 
-module.exports.init = function(){
+exports.mainPubSub = (event, callback) => {
 
   config.hosts.forEach(host => {
 
@@ -94,6 +93,7 @@ module.exports.init = function(){
 
     });
   });
-};
 
-require('make-runnable');
+  callback();
+
+};

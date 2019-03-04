@@ -7,7 +7,12 @@
   "author": "Cooper Labinger",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "build": "rm -rf lib/ && mkdir lib/ && cp package.json config.json index.js lib/.",
+    "deploy": "yarn run build && gcloud functions deploy mainPubSub --runtime nodejs6 --trigger-topic monitor-server --source=lib/"
+  },
   "dependencies": {
+    "@google-cloud/error-reporting": "^0.6.0",
     "curlrequest": "^1.0.1",
     "sparkpost": "^2.1.3"
   },
