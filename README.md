@@ -11,5 +11,10 @@ I originally tried to use ping, but Google Cloud Platform responds to ping reque
 ### Run from command line
 
 ``` bash
-$ node index.js init
+$ node -e 'require ("./index").mainPubSub({},()=>{})'
+```
+
+### Deploy to Google Cloud Functions
+``` bash
+$ yarn run deploy
 ```
