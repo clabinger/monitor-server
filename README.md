@@ -6,6 +6,8 @@ charged for it during that time.
 
 I originally tried to use ping, but Google Cloud Platform responds to ping requests even if a server is powered down. Instead, this script uses cURL and examines the error string to determine if a server is powered on.
 
+I use Google Cloud Scheduler, configured through the Google Cloud Console, to send a message to a Pub/Sub topic, which this function is deployed to listen on.
+
 ## Usage
 
 ### Run from command line
