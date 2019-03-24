@@ -18,5 +18,6 @@ $ node -e 'require ("./index").mainPubSub({},()=>{})'
 
 ### Deploy to Google Cloud Functions
 ``` bash
+$ gcloud config list # Check that you're deploying to the correct project
 $ yarn run deploy
 ```
