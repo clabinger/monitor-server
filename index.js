@@ -8,17 +8,25 @@ const errors = new ErrorReporting();
 // Search curl error message for the following substrings. Status: 0 = server off, 1 = server on
 const messages = [
   {
-    search: 'reply', // "Server didn't reply anything"
+    search: 'reply anything', // "The server didn't reply anything, which here is considered an error."
     status: 0
   },
   {
-    search: 'Failure in receiving',
+    search: 'Failure in receiving', // "Failure in receiving network data."
+    status: 0
+  },
+  {
+    search: 'Operation timeout', // Operation timeout. The specified time-out period was reached according to the conditions.
+    status: 0
+  },
+  {
+    search: 'resolve host', // Couldn't resolve host. The given remote host was not resolved.
     status: 0
   },
   {
     search: 'connect',
     status: 1
-  },
+  }
 ];
 
 // Send an email containing `message` to the list of recipients specified in the config file
