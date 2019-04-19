@@ -71,7 +71,7 @@ const handle_status = function(hostname, status, curl_message){
 
 }
 
-exports.mainPubSub = (event, callback) => {
+exports.mainPubSub = (data, context, callback) => {
 
   config.hosts.forEach(host => {
 
