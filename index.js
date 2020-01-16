@@ -78,6 +78,7 @@ exports.mainPubSub = (data, context, callback) => {
     curl.request({ url: host, verbose: true }, (err, parts) => {
 
       if(err){
+        // Curl library returned an error message
         
         // Track whether a match was found for the cURL error message
         let matched = 0;
@@ -95,8 +96,12 @@ exports.mainPubSub = (data, context, callback) => {
           handle_status(host, null, err);
         }
 
-      }else{
+      } else if (parts) {
+        // Data returned from server
         handle_status(host, 1, 'Server responded with headers and data.');
+      } else {
+        // No response (curl library timed out)
+        handle_status(host, 0, err)
       }
 
     });
