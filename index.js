@@ -112,3 +112,6 @@ exports.mainPubSub = (data, context, callback) => {
   }
 
 };
+
+// For easier command line testing. Do not deploy with this option.
+// require('make-runnable');
