@@ -102,6 +102,8 @@ exports.mainPubSub = (data, context, callback) => {
     });
   });
 
-  callback();
+  if (callback) {
+    callback();
+  }
 
 };
