@@ -24,8 +24,8 @@ const messages = [
     status: 0
   },
   {
-    search: 'connect',
-    status: 1
+    search: 'Failed to connect', // Failed to connect to host.
+    status: 0
   }
 ];
 
