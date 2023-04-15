@@ -1,7 +1,7 @@
 const config = require('./config.json');
 
 const curl = require('curlrequest');
-const SparkPost = require('sparkpost');
+const postmark = require('postmark');
 const {ErrorReporting} = require('@google-cloud/error-reporting');
 const errors = new ErrorReporting();
 
@@ -32,16 +32,13 @@ const messages = [
 // Send an email containing `message` to the list of recipients specified in the config file
 const send_email = function(message){
 
-  const mail = new SparkPost(config.sparkpost_api_key);
+  const client = new postmark.ServerClient(config.postmark_api_key);
 
-  mail.transmissions.send({
-    content: {
-      from: config.from_address,
-      subject: 'Server status notification',
-      html:'<html><body><p>' + message + '</p></body></html>'
-    },
-    return_path: config.email_return_path,
-    recipients: config.emails.map(email => ({address: email})),
+  client.sendEmail({
+      From: config.from_address,
+      To: config.emails.join(', '),
+      Subject: 'Server status notification',
+      HtmlBody:'<html><body><p>' + message + '</p></body></html>',
   })
   .catch(err => {
     // Email failed

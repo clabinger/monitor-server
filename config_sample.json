@@ -7,7 +7,6 @@
     "you@example.com",
     "someone@example.com"
   ],
-  "sparkpost_api_key": "<API_KEY>",
-  "email_return_path": "noreply@bounces.example.com",
+  "postmark_api_key": "<API_KEY>",
   "from_address": "\"Server Monitor\" <monitor@example.com>"
 }
