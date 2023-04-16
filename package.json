@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "build": "rm -rf lib/ && mkdir lib/ && cp package.json config.json index.js lib/.",
-    "deploy": "yarn run build && gcloud functions deploy mainPubSub --runtime nodejs10 --trigger-topic monitor-server --source=lib/"
+    "deploy": "yarn run build && gcloud functions deploy mainPubSub --runtime nodejs16 --trigger-topic monitor-server --source=lib/"
   },
   "dependencies": {
     "@google-cloud/error-reporting": "^1.1.3",
