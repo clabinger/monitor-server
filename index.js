@@ -1,114 +1,72 @@
-const config = require('./config.json');
+import fs from 'fs';
+import compute from '@google-cloud/compute';
+import postmark from 'postmark';
+import functions from '@google-cloud/functions-framework';
 
-const curl = require('curlrequest');
-const postmark = require('postmark');
-const {ErrorReporting} = require('@google-cloud/error-reporting');
-const errors = new ErrorReporting();
+const loadJSON = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url)));
 
-// Search curl error message for the following substrings. Status: 0 = server off, 1 = server on
-const messages = [
-  {
-    search: 'reply anything', // "The server didn't reply anything, which here is considered an error."
-    status: 0
-  },
-  {
-    search: 'Failure in receiving', // "Failure in receiving network data."
-    status: 0
-  },
-  {
-    search: 'Operation timeout', // Operation timeout. The specified time-out period was reached according to the conditions.
-    status: 0
-  },
-  {
-    search: 'resolve host', // Couldn't resolve host. The given remote host was not resolved.
-    status: 0
-  },
-  {
-    search: 'Failed to connect', // Failed to connect to host.
-    status: 0
-  }
-];
+const config = loadJSON('./config.json');
 
-// Send an email containing `message` to the list of recipients specified in the config file
-const send_email = function(message){
+const findPoweredOnInstances = async (projectId, zone) => {
+  const instancesClient = new compute.InstancesClient();
 
+  const [instanceList] = await instancesClient.list({
+    project: projectId,
+    zone,
+  });
+
+  return instanceList.filter((instance) => instance.status !== 'TERMINATED')
+    .map((instance) => ({
+      project: projectId,
+      name: instance.name,
+      status: instance.status,
+    }));
+};
+
+const sendEmail = (poweredOnInstances) => {
   const client = new postmark.ServerClient(config.postmark_api_key);
 
-  client.sendEmail({
-      From: config.from_address,
-      To: config.emails.join(', '),
-      Subject: 'Server status notification',
-      HtmlBody:'<html><body><p>' + message + '</p></body></html>',
-  })
-  .catch(err => {
-    // Email failed
-    errors.report(new Error(err));
+  const htmlList = poweredOnInstances
+    .map((instance) => `<li>
+      <a href="https://console.cloud.google.com/compute/instances?project=${instance.project}">${instance.project}</a>
+      - ${instance.name}: ${instance.status}
+    </li>`)
+    .join('');
+
+  return client.sendEmail({
+    From: config.from_address,
+    To: config.emails.join(', '),
+    Subject: 'Server status notification',
+    HtmlBody: `<html><body><p>The following instances are powered on:</p><ul>${htmlList}</ul></body></html>`,
   });
-}
+};
 
-// Once the status of a server is determined, handle what to do next
-const handle_status = function(hostname, status, curl_message){
+const main = async () => {
+  const promises = [];
 
-  let message = '';
-
-  if(status===1){
-    // Server is on, send email
-    message = '<p>Host ' + hostname + ' is powered on.</p>';
-  }else if(status===0){
-    // Server is off, don't do anything
-    // message = '<p>Host ' + hostname + ' is NOT powered on.</p>';
-  }else{
-    // Error, send email
-    message = '<p>Error: could not determine whether host ' + hostname + ' is powered on.</p>';
-  }
-
-  if(message){
-    send_email(message + '<p><b>cURL output is:</b> ' + curl_message + '</p>');
-  }
-
-}
-
-exports.mainPubSub = (data, context, callback) => {
-
-  config.hosts.forEach(host => {
-
-    curl.request({ url: host, verbose: true }, (err, parts) => {
-
-      if(err){
-        // Curl library returned an error message
-        
-        // Track whether a match was found for the cURL error message
-        let matched = 0;
-
-        // Check each message for match
-        messages.forEach(item => {
-          if(err.indexOf(item.search) > -1){
-            matched = 1;
-            handle_status(host, item.status, err);
-          }  
-        });
-        
-        // No match was found for the cURL error message
-        if(matched===0){
-          handle_status(host, null, err);
-        }
-
-      } else if (parts) {
-        // Data returned from server
-        handle_status(host, 1, 'Server responded with headers and data.');
-      } else {
-        // No response (curl library timed out)
-        handle_status(host, 0, err)
-      }
-
+  config.projectIds.forEach((projectId) => {
+    config.zones.forEach((zone) => {
+      promises.push(findPoweredOnInstances(projectId, zone));
     });
   });
 
-  if (callback) {
-    callback();
-  }
+  let poweredOnInstances = [];
 
+  const results = await Promise.all(promises);
+
+  results.forEach((instances) => {
+    poweredOnInstances = poweredOnInstances.concat(instances);
+  });
+
+  if (poweredOnInstances.length > 0) {
+    await sendEmail(poweredOnInstances);
+  }
 };
 
-// For easier command line testing. Do not deploy with this option.
-// require('make-runnable');
+functions.http('monitorServer', async (req, res) => {
+  await main();
+
+  res.send('OK');
+});
+
+export default main;

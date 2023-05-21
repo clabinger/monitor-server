@@ -1,7 +1,11 @@
 {
-  "hosts": [
-    "host1.example.com",
-    "host2.example.com"
+  "projectIds": [
+    "<project-id-a>",
+    "<project-id-b>"
+  ],
+  "zones": [
+    "us-central1-a",
+    "us-south1-a"
   ],
   "emails": [
     "you@example.com",

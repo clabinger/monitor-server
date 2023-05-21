@@ -1,23 +1,24 @@
 # monitor-server
-Contact my development server and email me if it is running (in case I forgot to shut it down when not in use)
 
-I use a Google Compute Engine instance for development purposes. If I shut it down when I'm not using it, I won't get 
-charged for it during that time. 
+For a given set of Google Cloud projects and a given set of Google Cloud zones, query for Compute Engine instances in those projects and zones, and if any instances are powered on, send a list of powered on instances in an email to a list of administrators.
 
-I originally tried to use ping, but Google Cloud Platform responds to ping requests even if a server is powered down. Instead, this script uses cURL and examines the error string to determine if a server is powered on.
+You can use Cloud Scheduler to run the deployed cloud function periodically.
 
-I use Google Cloud Scheduler, configured through the Google Cloud Console, to send a message to a Pub/Sub topic, which this function is deployed to listen on.
+## Version history
+
+Version 2.0.0 uses the Compute Engine API to query for instances in each project/zone combo.
+
+Version 1.0.0 took a list of hostnames, sent curl requests to those hostnames, and examined the error string to determine which hosts were powered on.
 
 ## Usage
 
 ### Run from command line
 
-``` bash
-$ node -e 'require ("./index").mainPubSub({},()=>{})'
+```bash
+$ npm run dev
 ```
 
 ### Deploy to Google Cloud Functions
 ``` bash
-$ gcloud config list # Check that you're deploying to the correct project
-$ yarn run deploy
+$ npm run deploy
 ```
