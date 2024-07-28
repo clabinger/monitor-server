@@ -9,18 +9,18 @@
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "lint": "npx eslint .",
     "predeploy": "npm run lint",
-    "deploy": "gcloud functions deploy monitor-server --gen2 --region=us-central1 --runtime=nodejs18 --source=. --entry-point=monitorServer --trigger-http --no-allow-unauthenticated",
+    "deploy": "gcloud functions deploy monitor-server --gen2 --region=us-central1 --runtime=nodejs20 --source=. --entry-point=monitorServer --trigger-http --no-allow-unauthenticated",
     "dev": "node dev.js"
   },
   "dependencies": {
-    "@google-cloud/compute": "^3.9.1",
-    "@google-cloud/functions-framework": "^3.2.0",
-    "postmark": "^3.0.18"
+    "@google-cloud/compute": "^4.7.0",
+    "@google-cloud/functions-framework": "^3.4.2",
+    "postmark": "^4.0.4"
   },
   "devDependencies": {
     "eslint": "^8.41.0",
