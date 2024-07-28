@@ -10,17 +10,21 @@ const config = loadJSON('./config.json');
 const findPoweredOnInstances = async (projectId, zone) => {
   const instancesClient = new compute.InstancesClient();
 
-  const [instanceList] = await instancesClient.list({
-    project: projectId,
-    zone,
-  });
-
-  return instanceList.filter((instance) => instance.status !== 'TERMINATED')
-    .map((instance) => ({
+  try {
+    const [instanceList] = await instancesClient.list({
       project: projectId,
-      name: instance.name,
-      status: instance.status,
-    }));
+      zone,
+    });
+
+    return instanceList.filter((instance) => instance.status !== 'TERMINATED')
+      .map((instance) => ({
+        project: projectId,
+        name: instance.name,
+        status: instance.status,
+      }));
+  } catch (e) {
+    return [];
+  }
 };
 
 const sendEmail = (poweredOnInstances) => {
