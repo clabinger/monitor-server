@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "npx eslint .",
     "predeploy": "npm run lint",
-    "deploy": "gcloud functions deploy monitor-server --gen2 --region=us-central1 --runtime=nodejs20 --source=. --entry-point=monitorServer --trigger-http --no-allow-unauthenticated",
+    "deploy": "gcloud functions deploy monitor-server --gen2 --memory=512 --region=us-central1 --runtime=nodejs20 --source=. --entry-point=monitorServer --trigger-http --no-allow-unauthenticated",
     "dev": "node dev.js"
   },
   "dependencies": {
